@@ -11,6 +11,13 @@
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 
+#include <sensor_msgs/PointCloud2.h>
+#include <pcl/PCLPointCloud2.h>
+#include <pcl_ros/point_cloud.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+
 #include <ST/CaptureSession.h>
 #include <ST/CameraFrames.h>
 
@@ -44,6 +51,8 @@ private:
 	ros::Publisher imu_pub_;
 	sensor_msgs::Imu imu_;
 
+	ros::Publisher cloud_pub_;
+
 public:
     SessionDelegate(ros::NodeHandle &nh, std::string &frame_id, ST::CaptureSessionSettings &sessionConfig)
     {
@@ -58,6 +67,7 @@ public:
 			// queue size is 1 because we only care about latest image
 			depth_image_pub_ = it.advertise("depth/image_rect", 1);
 			depth_caminfo_pub_ = nh_->advertise<sensor_msgs::CameraInfo>("depth/camera_info", 1);
+			cloud_pub_ = nh_->advertise<sensor_msgs::PointCloud2>("depth/points", 1);
 		}
 
 		if(sessionConfig_->structureCore.visibleEnabled)
@@ -233,12 +243,21 @@ public:
 
 		const float* buf = depthFrame.depthInMillimeters();
 
+		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+
 		for(int y = 0; y < depthFrame.height(); y++)
 		{
 			for(int x = 0; x < depthFrame.width(); x++)
 			{
 				std::size_t pixelOffset = (y * depthFrame.width()) + x;
 				img.at<float>(y, x) = buf[pixelOffset];
+
+				pcl::PointXYZ p;
+				p.z = buf[pixelOffset];
+				p.x = p.z * (y - depthFrame.intrinsics().cx) / depthFrame.intrinsics().fx;
+				p.y = p.z * (x - depthFrame.intrinsics().cy) / depthFrame.intrinsics().fy;
+
+				cloud->points.push_back(p);
 			}
 		}
 
@@ -253,6 +272,14 @@ public:
 		sensor_msgs::CameraInfo cam_info;
 		populateCamInfo(depthFrame.intrinsics(), header, cam_info);
 		depth_caminfo_pub_.publish(cam_info);
+
+		cloud->width = cloud->points.size();
+		cloud->height = 1;
+		cloud->is_dense = false;
+		sensor_msgs::PointCloud2 output;
+		pcl::toROSMsg(*cloud, output);
+		output.header = header;
+		cloud_pub_.publish(output);
 	}
 
 	void sendIMU(double timestamp)

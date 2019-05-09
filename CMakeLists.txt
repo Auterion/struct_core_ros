@@ -9,7 +9,10 @@ find_package(catkin REQUIRED COMPONENTS
   nodelet
   cv_bridge
   image_transport
+  pcl_ros
 )
+
+find_package(PCL 1.7 REQUIRED)
 
 set(CMAKE_CXX_FLAGS "-std=c++0x -pthread -fPIC ${CMAKE_CXX_FLAGS} -D__STDC_CONSTANT_MACROS")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1")
@@ -27,6 +30,7 @@ catkin_package(
 
 include_directories(
   include
+  ${PCL_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS})
 
 set(LINK_LIBRARIES
