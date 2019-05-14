@@ -378,6 +378,8 @@ private:
 
 	bool imu_enable_;
 
+  bool autoexposure_enable_;
+
 	SessionDelegate *delegate_ = nullptr;
 	ST::CaptureSessionSettings sessionConfig_;
 	ST::CaptureSession captureSession_;
@@ -405,6 +407,9 @@ public:
 		ros::param::param<std::string>("~frame_id", frame_id, DEFAULT_FRAME_ID);
 		ROS_INFO_STREAM(NODE_NAME << ": frame_id = " << frame_id);
 
+    ros::param::param<bool>("~autoexposure_enable", autoexposure_enable_, true);
+		ROS_INFO_STREAM(NODE_NAME << ": autoexposure_enable = " << autoexposure_enable_);
+
 		ST::CaptureSessionSettings::StructureCoreSettings scConfig;
 
 		scConfig.depthEnabled = depth_enable_;
@@ -412,6 +417,7 @@ public:
 		scConfig.visibleEnabled = vis_enable_;
 		scConfig.accelerometerEnabled = imu_enable_;
 		scConfig.gyroscopeEnabled = imu_enable_;
+    scConfig.infraredAutoExposureEnabled = autoexposure_enable_;
 
 		scConfig.depthResolution = ST::StructureCoreDepthResolution::VGA;
 		scConfig.visibleResolution = ST::StructureCoreVisibleResolution::Default;

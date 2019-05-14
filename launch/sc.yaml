@@ -3,3 +3,4 @@ sc:
   ir_enable: false
   depth_enable: true
   imu_enable: false
+  autoexposure_enable: true
