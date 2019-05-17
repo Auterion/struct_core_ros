@@ -252,11 +252,8 @@ public:
 				std::size_t pixelOffset = (y * depthFrame.width()) + x;
 				img.at<float>(y, x) = buf[pixelOffset];
 
-				pcl::PointXYZ p;
-				p.z = buf[pixelOffset];
-				p.x = p.z * (y - depthFrame.intrinsics().cx) / depthFrame.intrinsics().fx;
-				p.y = p.z * (x - depthFrame.intrinsics().cy) / depthFrame.intrinsics().fy;
-
+				ST::Vector3f point = depthFrame.unprojectPoint(y, x);
+				pcl::PointXYZ p(point.x, point.y, point.z);
 				cloud->points.push_back(p);
 			}
 		}
@@ -417,7 +414,10 @@ public:
 		scConfig.visibleEnabled = vis_enable_;
 		scConfig.accelerometerEnabled = imu_enable_;
 		scConfig.gyroscopeEnabled = imu_enable_;
-    scConfig.infraredAutoExposureEnabled = autoexposure_enable_;
+		scConfig.infraredAutoExposureEnabled = autoexposure_enable_;
+		scConfig.infraredFramerate = 15.f;
+		scConfig.depthFramerate    = 15.f;
+		scConfig.visibleFramerate  = 15.f;
 
 		scConfig.depthResolution = ST::StructureCoreDepthResolution::VGA;
 		scConfig.visibleResolution = ST::StructureCoreVisibleResolution::Default;
@@ -426,6 +426,7 @@ public:
 
 		sessionConfig_.source = ST::CaptureSessionSourceId::StructureCore;
 		sessionConfig_.structureCore = scConfig;
+		sessionConfig_.applyExpensiveCorrection = true;
 
 		delegate_ = new SessionDelegate(nh_, frame_id, sessionConfig_);
 		captureSession_.setDelegate(delegate_);
