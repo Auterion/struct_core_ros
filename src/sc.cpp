@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <mutex>
 #include <condition_variable>
+#include <cmath>
 #include <memory>
 #include <functional>
 #include <ros/ros.h>
@@ -26,7 +27,8 @@
 
 #define DEFAULT_FRAME_ID 	"sc_FLU"
 #define LOG_PERIOD_S 		10
-#define NODE_NAME 			"sc"
+#define NODE_NAME 		"sc"
+#define MM_TO_M 		(1.f/1000.f)
 
 struct SessionDelegate : ST::CaptureSessionDelegate {
 private:
@@ -244,6 +246,7 @@ public:
 		const float* buf = depthFrame.depthInMillimeters();
 
 		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+		cloud->points.reserve(depthFrame.width()*depthFrame.height());
 
 		for(int y = 0; y < depthFrame.height(); y++)
 		{
@@ -251,11 +254,13 @@ public:
 			{
 				std::size_t pixelOffset = (y * depthFrame.width()) + x;
 				img.at<float>(y, x) = buf[pixelOffset];
-
-				ST::Vector3f point = depthFrame.unprojectPoint(y, x);
-				// covert point from millimeters to meters
-				pcl::PointXYZ p(point.x / 1000.0, point.y / 1000.0, point.z / 1000.0);
-				cloud->points.push_back(p);
+				if (!std::isnan(buf[pixelOffset]))
+				{
+					ST::Vector3f point = depthFrame.unprojectPoint(y, x);
+					// covert point from millimeters to meters
+					pcl::PointXYZ p(point.x * MM_TO_M, point.y * MM_TO_M, point.z * MM_TO_M);
+					cloud->points.push_back(p);
+				}
 			}
 		}
 
