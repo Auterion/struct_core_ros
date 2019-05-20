@@ -253,7 +253,8 @@ public:
 				img.at<float>(y, x) = buf[pixelOffset];
 
 				ST::Vector3f point = depthFrame.unprojectPoint(y, x);
-				pcl::PointXYZ p(point.x, point.y, point.z);
+				// covert point from millimeters to meters
+				pcl::PointXYZ p(point.x / 1000.0, point.y / 1000.0, point.z / 1000.0);
 				cloud->points.push_back(p);
 			}
 		}
