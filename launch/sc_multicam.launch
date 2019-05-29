@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+	<rosparam command="load" file="$(find struct_core_ros)/launch/sc.yaml"/>
+	<node pkg="struct_core_ros" type="sc" name="camera1" output="screen">
+	     <param name="serial_number" type="str" value="2010" />
+    </node>
+    <node pkg="struct_core_ros" type="sc" name="camera2" output="screen">
+	     <param name="serial_number" type="str" value="2001" />
+    </node>
+</launch>

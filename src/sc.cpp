@@ -381,7 +381,9 @@ private:
 
 	bool imu_enable_;
 
-  bool autoexposure_enable_;
+    bool autoexposure_enable_;
+
+    std::string serial_number_;
 
 	SessionDelegate *delegate_ = nullptr;
 	ST::CaptureSessionSettings sessionConfig_;
@@ -406,15 +408,20 @@ public:
 		ros::param::param<bool>("imu_enable", imu_enable_, false);
 		ROS_INFO_STREAM(NODE_NAME << ": imu_enable = " << imu_enable_);
 
+		ros::param::param<bool>("autoexposure_enable", autoexposure_enable_, true);
+		ROS_INFO_STREAM(NODE_NAME << ": autoexposure_enable = " << autoexposure_enable_);
+
 		std::string frame_id;
 		std::string node_name = ros::this_node::getName();
 		node_name = node_name.erase(0,1);
 		std::string default_frame_id = (node_name + "_FLU").c_str();
-		ros::param::param<std::string>("frame_id", frame_id, default_frame_id);
+		ros::param::param<std::string>("~frame_id", frame_id, default_frame_id);
 		ROS_INFO_STREAM(NODE_NAME << ": frame_id = " << frame_id);
 
-    ros::param::param<bool>("autoexposure_enable", autoexposure_enable_, true);
-		ROS_INFO_STREAM(NODE_NAME << ": autoexposure_enable = " << autoexposure_enable_);
+		ros::param::param<std::string>("~serial_number", serial_number_, "null");
+		ROS_INFO_STREAM(NODE_NAME << ": serial_number = " << serial_number_);
+
+
 
 		ST::CaptureSessionSettings::StructureCoreSettings scConfig;
 
@@ -427,6 +434,9 @@ public:
 		scConfig.infraredFramerate = 15.f;
 		scConfig.depthFramerate    = 15.f;
 		scConfig.visibleFramerate  = 15.f;
+		if(serial_number_.compare("null") != 0){
+			scConfig.sensorSerial = serial_number_.c_str();
+		}
 
 		scConfig.depthResolution = ST::StructureCoreDepthResolution::VGA;
 		scConfig.visibleResolution = ST::StructureCoreVisibleResolution::Default;
