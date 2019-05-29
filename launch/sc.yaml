@@ -1,4 +1,4 @@
-sc:
+
   vis_enable: false
   ir_enable: false
   depth_enable: true

@@ -394,23 +394,26 @@ public:
 	SCNode()  : nh_("~")
 	{
 
-		ros::param::param<bool>("~vis_enable", vis_enable_, false);
+		ros::param::param<bool>("vis_enable", vis_enable_, false);
 		ROS_INFO_STREAM(NODE_NAME << ": vis_enable = " << vis_enable_);
 
-		ros::param::param<bool>("~ir_enable", ir_enable_, false);
+		ros::param::param<bool>("ir_enable", ir_enable_, false);
 		ROS_INFO_STREAM(NODE_NAME << ": ir_enable = " << ir_enable_);
 
-		ros::param::param<bool>("~depth_enable", depth_enable_, false);
+		ros::param::param<bool>("depth_enable", depth_enable_, false);
 		ROS_INFO_STREAM(NODE_NAME << ": depth_enable = " << depth_enable_);
 
-		ros::param::param<bool>("~imu_enable", imu_enable_, false);
+		ros::param::param<bool>("imu_enable", imu_enable_, false);
 		ROS_INFO_STREAM(NODE_NAME << ": imu_enable = " << imu_enable_);
 
 		std::string frame_id;
-		ros::param::param<std::string>("~frame_id", frame_id, DEFAULT_FRAME_ID);
+		std::string node_name = ros::this_node::getName();
+		node_name = node_name.erase(0,1);
+		std::string default_frame_id = (node_name + "_FLU").c_str();
+		ros::param::param<std::string>("frame_id", frame_id, default_frame_id);
 		ROS_INFO_STREAM(NODE_NAME << ": frame_id = " << frame_id);
 
-    ros::param::param<bool>("~autoexposure_enable", autoexposure_enable_, true);
+    ros::param::param<bool>("autoexposure_enable", autoexposure_enable_, true);
 		ROS_INFO_STREAM(NODE_NAME << ": autoexposure_enable = " << autoexposure_enable_);
 
 		ST::CaptureSessionSettings::StructureCoreSettings scConfig;
