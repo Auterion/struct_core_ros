@@ -396,19 +396,19 @@ public:
 	SCNode()  : nh_("~")
 	{
 
-		ros::param::param<bool>("vis_enable", vis_enable_, false);
+		ros::param::param<bool>("sc/vis_enable", vis_enable_, false);
 		ROS_INFO_STREAM(NODE_NAME << ": vis_enable = " << vis_enable_);
 
-		ros::param::param<bool>("ir_enable", ir_enable_, false);
+		ros::param::param<bool>("sc/ir_enable", ir_enable_, false);
 		ROS_INFO_STREAM(NODE_NAME << ": ir_enable = " << ir_enable_);
 
-		ros::param::param<bool>("depth_enable", depth_enable_, false);
+		ros::param::param<bool>("sc/depth_enable", depth_enable_, false);
 		ROS_INFO_STREAM(NODE_NAME << ": depth_enable = " << depth_enable_);
 
-		ros::param::param<bool>("imu_enable", imu_enable_, false);
+		ros::param::param<bool>("sc/imu_enable", imu_enable_, false);
 		ROS_INFO_STREAM(NODE_NAME << ": imu_enable = " << imu_enable_);
 
-		ros::param::param<bool>("autoexposure_enable", autoexposure_enable_, true);
+		ros::param::param<bool>("sc/autoexposure_enable", autoexposure_enable_, true);
 		ROS_INFO_STREAM(NODE_NAME << ": autoexposure_enable = " << autoexposure_enable_);
 
 		std::string frame_id;
