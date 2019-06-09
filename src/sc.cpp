@@ -247,6 +247,8 @@ public:
 
 		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 		cloud->points.reserve(depthFrame.width()*depthFrame.height());
+    int counter_pcl = 0;
+    int counter_nan = 0;
 
 		for(int y = 0; y < depthFrame.height(); y++)
 		{
@@ -260,9 +262,13 @@ public:
 					// covert point from millimeters to meters
 					pcl::PointXYZ p(point.x * MM_TO_M, point.y * MM_TO_M, point.z * MM_TO_M);
 					cloud->points.push_back(p);
-				}
+          counter_pcl++;
+				} else {
+          counter_nan++;
+        }
 			}
 		}
+    ROS_INFO("[SC] Struct Core pcl size %d, nan size %d", counter_pcl, counter_nan);
 
 		std_msgs::Header header;
 		header.frame_id = frame_id_;
